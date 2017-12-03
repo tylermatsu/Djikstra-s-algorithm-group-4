@@ -1,15 +1,15 @@
 import java.util.*;
-import java.util.Map.Entry;
-import java.io.*;
+        import java.util.Map.Entry;
+        import java.io.*;
 
 public class Graph<E>
 {
     // todo: ask for approval
     // actually we can move it into the Dijkstra class
-    LinkedStack<Edge<E>> deletedEdgeStack;
+    public LinkedStack<Edge<E>> deletedEdgeStack;
 
     // todo: ask for approval
-    Edge<E> undo() {
+    public Edge<E> undo() {
         return deletedEdgeStack.pop();
     }
 
@@ -224,6 +224,7 @@ public class Graph<E>
 
             // write to file
             writer.write(graphStr);
+            System.out.println("\nWriting complete.");
         } catch (Exception e) {
             System.out.println("Oops! This is super awkward.");
         }
