@@ -5,9 +5,11 @@ public class Launcher {
 
         UI.greetings();
 
-        while (!UI.loadGraph(graph)) {
-            UI.loadingFailed();
-        }
+//        while (!UI.loadGraph(graph)) {
+//            UI.loadingFailed();
+//        }
+
+        UI.tempGraphBuilder(graph);
 
         do {
             UI.takeOrder();
