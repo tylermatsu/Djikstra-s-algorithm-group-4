@@ -3,66 +3,13 @@ import java.util.Map.Entry;
 import java.util.Comparator;
 import java.io.*;
 
-public class Dijkstras<E> extends Graph<E>
+public class Dijkstra<E> extends Graph<E>
 {
     private PriorityQueue< Vertex<E> > vertexPriorityQueue; // will add vertexes from largest to smallest weight
     private Stack< Vertex<E> > visitedRouteStack; // track the route
     private ArrayList< Edge<E> > theGrandRouteEdgeList; // the route
 
-    void saveToFile(String graphStr, String filename) {
-        // todo: address will be updated accordingly to the lab computer or something
-        String tempAddress = "/Users/mantinglin/Desktop/" + filename + ".txt";
-
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(tempAddress), "utf-8"))) {
-            writer.write(graphStr);
-        } catch (Exception e) {
-            System.out.println("Oops! This is super awkward.");
-        }
-    }
-
-    // getGraph_AdjList:
-    // return a string contains all the AdjLists of its vertexes, ready to
-    // write to file
-    String getGraph_AdjList() {
-        Iterator<Entry<E, Vertex<E>>> iter;
-        String graphStr = "";
-
-        iter = vertexSet.entrySet().iterator();
-        while( iter.hasNext() )
-        {
-            graphStr += getAdjListInVertex( iter.next().getValue() ) + "\n";
-        }
-
-        return graphStr;
-    }
-
-    // todo (enquriy): should be in Vertex class
-
-    // getAdjListInVertex:
-    // return a string contains the AdjLists of the vertex parameter
-    String getAdjListInVertex(Vertex<E> v)
-    {
-        Iterator<Entry<E, Pair<Vertex<E>, Double>>> iter ;
-        Entry<E, Pair<Vertex<E>, Double>> entry;
-        Pair<Vertex<E>, Double> pair;
-        String vertexStr;
-
-        vertexStr = "Adj List for " + v.data + ": ";
-        iter = v.adjList.entrySet().iterator();
-        while( iter.hasNext() )
-        {
-            entry = iter.next();
-            pair = entry.getValue();
-            vertexStr += pair.first.data + "("
-                    + String.format("%3.1f", pair.second)
-                    + ") ";
-        }
-
-        return vertexStr;
-    }
-
-    public Dijkstras ()
+    public Dijkstra ()
     {
         vertexPriorityQueue = new PriorityQueue<>(vertexComparator);
         visitedRouteStack = new Stack<>();
@@ -77,10 +24,11 @@ public class Dijkstras<E> extends Graph<E>
         Pair<Vertex<E>, Double> pair;
         Vertex<E> vertex;
 
-        /* @todo: write hashCode() for our E object, that's how we can locate the incoming object
-                  which contains the E object from the vertexSet, because the vertexSet hash the E object
-                  during storing */
+        /* todo: write hashCode() for our E object, that's how we can locate the incoming object
+           which contains the E object from the vertexSet, because the vertexSet hash the E object
+           during storing */
 
+        // todo: fix this
         // @HELLO: we have to make sure that our data set is a "perfect channel", which means if two vertexes exist
         // in our data set, there must be way to get from a to b, beside of the direct road, because like we
         // discussed before, the direct route may not be available.
@@ -153,6 +101,58 @@ public class Dijkstras<E> extends Graph<E>
             System.out.println("Please check your source and destination, merci.");
             return null;
         }
+    }
+
+    void saveToFile(String graphStr, String filename) {
+        // todo: address will be updated accordingly to the lab computer
+        String tempAddress = "/Users/mantinglin/Desktop/" + filename + ".txt";
+
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(tempAddress), "utf-8"))) {
+            writer.write(graphStr);
+        } catch (Exception e) {
+            System.out.println("Oops! This is super awkward.");
+        }
+    }
+
+    // getGraph_AdjList:
+    // return a string contains all the AdjLists of its vertexes, ready to
+    // write to file
+    String getGraph_AdjList() {
+        Iterator<Entry<E, Vertex<E>>> iter;
+        String graphStr = "";
+
+        iter = vertexSet.entrySet().iterator();
+        while( iter.hasNext() )
+        {
+            graphStr += getAdjListInVertex( iter.next().getValue() ) + "\n";
+        }
+
+        return graphStr;
+    }
+
+    // todo (enquriy): should be in Vertex class
+    // getAdjListInVertex:
+    // return a string contains the AdjLists of the vertex parameter
+    String getAdjListInVertex(Vertex<E> v)
+    {
+        Iterator<Entry<E, Pair<Vertex<E>, Double>>> iter ;
+        Entry<E, Pair<Vertex<E>, Double>> entry;
+        Pair<Vertex<E>, Double> pair;
+        String vertexStr;
+
+        vertexStr = "Adj List for " + v.data + ": ";
+        iter = v.adjList.entrySet().iterator();
+        while( iter.hasNext() )
+        {
+            entry = iter.next();
+            pair = entry.getValue();
+            vertexStr += pair.first.data + "("
+                    + String.format("%3.1f", pair.second)
+                    + ") ";
+        }
+
+        return vertexStr;
     }
 
     // to not to make too much change in vertex class, override the comparator for priority queue
