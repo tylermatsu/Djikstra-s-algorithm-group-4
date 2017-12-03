@@ -19,4 +19,7 @@ public class Airport {
     public String toString() {
         return airportName;
     }
+    
+    // todo: hasher needed
+    
 }
