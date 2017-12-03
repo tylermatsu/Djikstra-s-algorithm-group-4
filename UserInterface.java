@@ -1,6 +1,8 @@
 import java.util.*;
 import java.io.*;
 
+// todo dealing with the unexpected input, not only the numbers
+
 public class UserInterface {
     private boolean status;
     private Dijkstra<Airport> graph;
@@ -12,10 +14,6 @@ public class UserInterface {
     public void greetings() {
         System.out.println("Hi!");
         System.out.println("Before the stimulation, please provide the address for the graph file.\n");
-    }
-
-    public void loadingFailed() {
-        System.out.println("Would you like to try that again?\n-");
     }
 
     public boolean loadGraph(Dijkstra<Airport> graphP) {
@@ -38,6 +36,22 @@ public class UserInterface {
 
     }
 
+    public void loadingFailed() {
+        System.out.println("Would you like to try that again?\n-");
+    }
+
+    private void displayMainMenu() {
+        refresh();
+        System.out.println("-\nMenu:\n");
+        System.out.println("1. Add Edge");
+        System.out.println("2. Remove Edge:");
+        System.out.println("3. Undo remove:");
+        System.out.println("4. Display Graph");
+        System.out.println("5. Solve Graph");
+        System.out.println("6. Write Graph to File");
+        System.out.println("\n* Enter 0 to QUIT *\n-\n");
+    }
+
     public void takeOrder() {
         Scanner keyboard = new Scanner(System.in);
 
@@ -51,47 +65,112 @@ public class UserInterface {
         switch (item) {
             case 0: offStatus();
                 break;
-            case 1:  addEdge();
+            case 1: addEdge();
                 break;
-            case 2:  removeEdge();
+            case 2: removeEdge();
                 break;
-            case 3:  graph.undo();
+            case 3: undo();
                 break;
-            case 4:  graph.showAdjTable();
+            case 4: displayGraph();
                 break;
-            case 5:  solveBestRoute();
+            case 5: solveBestRoute();
                 break;
-            case 6:  writeToFile();
+            case 6:
+                graph.writeAdjListToFile();
+                waitForENTER();
                 break;
             default:
                 displayMainMenu();
-                System.out.println("\n\"There is not such thing on the menu!\" Georgie says with fury.");
+                System.out.println("\"There is not such thing on the menu!\" Georgie says with fury.");
                 waitForENTER();
                 takeOrder();
                 break;
         }
     }
 
-    private void displayMainMenu() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-
-        System.out.println("-\nMenu:\n");
-        System.out.println("1. Add Edge");
-        System.out.println("2. Remove Edge:");
-        System.out.println("3. Undo remove:");
-        System.out.println("4. Display Graph");
-        System.out.println("5. Solve Graph");
-        System.out.println("6. Write Graph to File");
-        System.out.println("\n* Enter 0 to QUIT *\n-\n");
-    }
-
     private void offStatus() {
         status = false;
     }
 
+    private void addEdge() {
+        System.out.println("action needed for Tyler");
+
+        waitForENTER();
+    }
+
+    private void removeEdge() {
+        System.out.println("action needed for George");
+
+        waitForENTER();
+    }
+
+    private void undo() {
+        if (graph.deletedEdgeStack.isEmpty()) {
+            System.out.println("Oops! No previous deleting action found.");
+            waitForENTER();
+        }
+        else {
+            System.out.println("No previous deleting action found.");
+
+            graph.undo();
+        }
+    }
+
+    private void displayGraph() {
+        Scanner keyboard = new Scanner(System.in);
+
+        refresh();
+
+        System.out.println("-\nStyles:\n");
+        System.out.println("1. Depth-First");
+        System.out.println("2. Breadth-First");
+        System.out.println("3. Adjacency List\n-\n");
+
+        System.out.println("\"In which fashion do you prefer displaying the graph?\" George Clooney asks.\n");
+
+        System.out.print("Item: ");
+        int item = keyboard.nextInt();
+
+        switch (item) {
+            case 1:  showGraph_Depth_First();
+                break;
+            case 2:  showGraph_Breadth_First();
+                break;
+            case 3:
+                graph.showAdjTable();
+                waitForENTER();
+                break;
+            default:
+                System.out.println("action needed for Man");
+                waitForENTER();
+                break;
+        }
+    }
+
+    private void showGraph_Depth_First() {
+        System.out.println("action needed for George");
+
+        waitForENTER();
+    }
+
+    private void showGraph_Breadth_First() {
+        System.out.println("action needed for Tyler");
+
+        waitForENTER();
+    }
+
+    private void solveBestRoute() {
+        System.out.println("action needed for Man");
+
+        waitForENTER();
+    }
+
     public boolean getStatus() {
         return status;
+    }
+
+    public void adios() {
+        System.out.println("\n\"Adios!\" George Clooney waves at you and smiles.\n");
     }
 
     private void waitForENTER() {
@@ -99,8 +178,9 @@ public class UserInterface {
         try { System.in.read(); } catch (IOException e) { }
     }
 
-    public void adios() {
-        System.out.println("\n\"Adios!\" George Clooney waves at you and smiles.\n");
+    private void refresh() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
     private static Scanner userScanner = new Scanner(System.in);
@@ -124,7 +204,7 @@ public class UserInterface {
         return scanner;
     }
 
-    private static void tempGraphBuilder(Graph<Airport> graph) {
+    public void tempGraphBuilder(Graph<Airport> graphP) {
         Airport airportA = new Airport("AAA");
         Airport airportB = new Airport("BBB");
         Airport airportC = new Airport("CCC");
@@ -136,63 +216,65 @@ public class UserInterface {
         Airport airportI = new Airport("III");
         Airport airportJ = new Airport("JJJ");
 
-        graph.addEdge(airportA, airportB, 1);
-        graph.addEdge(airportA, airportC, 2);
-        graph.addEdge(airportA, airportD, 3);
-        graph.addEdge(airportA, airportE, 4);
-        graph.addEdge(airportA, airportF, 5);
-        graph.addEdge(airportA, airportG, 6);
-        graph.addEdge(airportA, airportH, 7);
-        graph.addEdge(airportA, airportI, 8);
-        graph.addEdge(airportA, airportJ, 9);
+        graphP.addEdge(airportA, airportB, 1);
+        graphP.addEdge(airportA, airportC, 2);
+        graphP.addEdge(airportA, airportD, 3);
+        graphP.addEdge(airportA, airportE, 4);
+        graphP.addEdge(airportA, airportF, 5);
+        graphP.addEdge(airportA, airportG, 6);
+        graphP.addEdge(airportA, airportH, 7);
+        graphP.addEdge(airportA, airportI, 8);
+        graphP.addEdge(airportA, airportJ, 9);
 
-        graph.addEdge(airportB, airportC, 11);
-        graph.addEdge(airportB, airportD, 12);
-        graph.addEdge(airportB, airportE, 13);
-        graph.addEdge(airportB, airportF, 14);
-        graph.addEdge(airportB, airportG, 15);
-        graph.addEdge(airportB, airportH, 16);
-        graph.addEdge(airportB, airportI, 17);
-        graph.addEdge(airportB, airportJ, 18);
+        graphP.addEdge(airportB, airportC, 11);
+        graphP.addEdge(airportB, airportD, 12);
+        graphP.addEdge(airportB, airportE, 13);
+        graphP.addEdge(airportB, airportF, 14);
+        graphP.addEdge(airportB, airportG, 15);
+        graphP.addEdge(airportB, airportH, 16);
+        graphP.addEdge(airportB, airportI, 17);
+        graphP.addEdge(airportB, airportJ, 18);
 
-        graph.addEdge(airportC, airportD, 21);
-        graph.addEdge(airportC, airportE, 22);
-        graph.addEdge(airportC, airportF, 23);
-        graph.addEdge(airportC, airportG, 24);
-        graph.addEdge(airportC, airportH, 25);
-        graph.addEdge(airportC, airportI, 26);
-        graph.addEdge(airportC, airportJ, 27);
+        graphP.addEdge(airportC, airportD, 21);
+        graphP.addEdge(airportC, airportE, 22);
+        graphP.addEdge(airportC, airportF, 23);
+        graphP.addEdge(airportC, airportG, 24);
+        graphP.addEdge(airportC, airportH, 25);
+        graphP.addEdge(airportC, airportI, 26);
+        graphP.addEdge(airportC, airportJ, 27);
 
-        graph.addEdge(airportD, airportE, 31);
-        graph.addEdge(airportD, airportF, 32);
-        graph.addEdge(airportD, airportG, 33);
-        graph.addEdge(airportD, airportH, 34);
-        graph.addEdge(airportD, airportI, 35);
-        graph.addEdge(airportD, airportJ, 36);
-
-
-        graph.addEdge(airportE, airportF, 41);
-        graph.addEdge(airportE, airportG, 42);
-        graph.addEdge(airportE, airportH, 43);
-        graph.addEdge(airportE, airportI, 44);
-        graph.addEdge(airportE, airportJ, 45);
+        graphP.addEdge(airportD, airportE, 31);
+        graphP.addEdge(airportD, airportF, 32);
+        graphP.addEdge(airportD, airportG, 33);
+        graphP.addEdge(airportD, airportH, 34);
+        graphP.addEdge(airportD, airportI, 35);
+        graphP.addEdge(airportD, airportJ, 36);
 
 
-        graph.addEdge(airportF, airportG, 51);
-        graph.addEdge(airportF, airportH, 52);
-        graph.addEdge(airportF, airportI, 53);
-        graph.addEdge(airportF, airportJ, 54);
+        graphP.addEdge(airportE, airportF, 41);
+        graphP.addEdge(airportE, airportG, 42);
+        graphP.addEdge(airportE, airportH, 43);
+        graphP.addEdge(airportE, airportI, 44);
+        graphP.addEdge(airportE, airportJ, 45);
 
 
-        graph.addEdge(airportG, airportH, 61);
-        graph.addEdge(airportG, airportI, 62);
-        graph.addEdge(airportG, airportJ, 63);
+        graphP.addEdge(airportF, airportG, 51);
+        graphP.addEdge(airportF, airportH, 52);
+        graphP.addEdge(airportF, airportI, 53);
+        graphP.addEdge(airportF, airportJ, 54);
 
 
-        graph.addEdge(airportH, airportI, 71);
-        graph.addEdge(airportH, airportJ, 72);
+        graphP.addEdge(airportG, airportH, 61);
+        graphP.addEdge(airportG, airportI, 62);
+        graphP.addEdge(airportG, airportJ, 63);
 
 
-        graph.addEdge(airportI, airportJ, 81);
+        graphP.addEdge(airportH, airportI, 71);
+        graphP.addEdge(airportH, airportJ, 72);
+
+
+        graphP.addEdge(airportI, airportJ, 81);
+
+        graph = (Dijkstra<Airport>) graphP;
     }
 }
