@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.Map.Entry;
+import java.io.*;
 
 public class Graph<E>
 {
@@ -98,9 +99,6 @@ public class Graph<E>
         System.out.println();
     }
 
-
-
-
     public void clear()
     {
         vertexSet.clear();
@@ -171,11 +169,63 @@ public class Graph<E>
 
     }
 
-
 // WRITE THE INSTANCE METHOD HERE TO
     //         WRITE THE GRAPH's vertices and its
     //         adjacency list TO A TEXT FILE (SUGGEST TO PASS AN
     //        ALREADY OPEN PrintWriter TO THIS) !
 
+    void writeAdjListToFile() {
+        // refresh
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
 
+        // prompt for filename
+        System.out.print("Filename: ");
+
+        Scanner scanner = new Scanner(System.in);
+        String filename = scanner.nextLine();
+
+        // todo: change accordingly for the lab computer or something
+        String tempAddress = "/Users/mantinglin/Desktop/" + filename + ".txt";
+
+        // open file
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(tempAddress), "utf-8"))) {
+
+            Iterator<Entry<E, Vertex<E>>> vIter;
+            String graphStr = "";
+
+            // iterate through vertexes in vertexSet
+            vIter = vertexSet.entrySet().iterator();
+            while( vIter.hasNext() )
+            {
+                Vertex<E> v = vIter.next().getValue();
+
+                Iterator<Entry<E, Pair<Vertex<E>, Double>>> adjIter ;
+                Entry<E, Pair<Vertex<E>, Double>> entry;
+                Pair<Vertex<E>, Double> pair;
+                String vertexStr;
+
+                vertexStr = "Adj List for " + v.data + ": ";
+
+                // iterate through adjacencies in adjList
+                adjIter = v.adjList.entrySet().iterator();
+                while( adjIter.hasNext() )
+                {
+                    entry = adjIter.next();
+                    pair = entry.getValue();
+                    vertexStr += pair.first.data + "("
+                            + String.format("%3.1f", pair.second)
+                            + ") ";
+                }
+
+                graphStr += vertexStr + "\n";
+            }
+
+            // write to file
+            writer.write(graphStr);
+        } catch (Exception e) {
+            System.out.println("Oops! This is super awkward.");
+        }
+    }
 }
