@@ -93,13 +93,37 @@ public class UserInterface {
     }
 
     private void addEdge() {
-        System.out.println("action needed for Tyler");
+        Scanner keyboard = new Scanner(System.in);
+
+        System.out.print("Source airport: ");
+        Airport source = new Airport(promptAirportStr());
+
+        System.out.print("Destination airport: ");
+        Airport dest = new Airport(promptAirportStr());
+
+        System.out.print("Cost: ");
+        double cost = keyboard.nextInt();
+
+        graph.addEdge(source, dest, cost);
+
+        System.out.print("Adding complete.");
 
         waitForENTER();
     }
 
     private void removeEdge() {
-        System.out.println("action needed for George");
+        System.out.print("Source airport: ");
+        Airport source = new Airport(promptAirportStr());
+
+        System.out.print("Destination airport: ");
+        Airport dest = new Airport(promptAirportStr());
+
+        if (graph.remove(source, dest)) {
+            System.out.print("Removing complete.");
+        }
+        else {
+            System.out.print("Removing failed");
+        }
 
         waitForENTER();
     }
@@ -107,13 +131,11 @@ public class UserInterface {
     private void undo() {
         if (graph.deletedEdgeStack.isEmpty()) {
             System.out.println("Oops! No previous deleting action found.");
-            waitForENTER();
         }
         else {
-            System.out.println("No previous deleting action found.");
-
             graph.undo();
         }
+        waitForENTER();
     }
 
     private void displayGraph() {
@@ -148,21 +170,66 @@ public class UserInterface {
     }
 
     private void showGraph_Depth_First() {
-        System.out.println("action needed for George");
+        System.out.print("Preferred starting airport for traversal: ");
+        Airport preferredStartingAirport = new Airport(promptAirportStr());
+
+        if (graph.vertexSet.containsKey(preferredStartingAirport)) {
+            System.out.println("Displaying graph in Depth-First Fashion: ");
+            graph.depthFirstTraversal(preferredStartingAirport, new AirportVisitor());
+        }
+        else {
+            System.out.println("Starting vertex does not exist.");
+        }
 
         waitForENTER();
     }
 
     private void showGraph_Breadth_First() {
-        System.out.println("action needed for Tyler");
+        System.out.print("Preferred starting airport for traversal: ");
+        Airport preferredStartingAirport = new Airport(promptAirportStr());
+
+        if (graph.vertexSet.containsKey(preferredStartingAirport)) {
+            System.out.println("Displaying graph in Breadth_First Fashion: ");
+            graph.breadthFirstTraversal(preferredStartingAirport, new AirportVisitor());
+        }
+        else {
+            System.out.println("Starting vertex does not exist.");
+        }
 
         waitForENTER();
     }
 
     private void solveBestRoute() {
-        System.out.println("action needed for Man");
+        System.out.print("Source airport: ");
+        Vertex<Airport> source = new Vertex<>(new Airport(promptAirportStr()));
+
+        System.out.print("Destination airport: ");
+        Vertex<Airport> dest = new Vertex<>(new Airport(promptAirportStr()));
+
+        graph.unvisitVertices();
+
+        ArrayList<Edge<Airport>> bestRoute = graph.applyDijkstras(source, dest);
+
+        if (bestRoute != null) {
+            System.out.println("The best route available is:");
+            printRoute(bestRoute);
+        }
 
         waitForENTER();
+    }
+
+    private void printRoute(ArrayList<Edge<Airport>> bestRoute) {
+        Iterator<Edge<Airport>> iter ;
+
+        iter = bestRoute.iterator();
+        while (iter.hasNext()) {
+            System.out.println(iter.next().toString());
+        }
+    }
+
+    private String promptAirportStr() {
+        Scanner keyboard = new Scanner(System.in);
+        return keyboard.nextLine();
     }
 
     public boolean getStatus() {
