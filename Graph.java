@@ -9,8 +9,10 @@ public class Graph<E>
     public LinkedStack<Edge<E>> deletedEdgeStack;
 
     // todo: ask for approval
-    public Edge<E> undo() {
-        return deletedEdgeStack.pop();
+    public void undo() {
+        Edge<E> deletedEdge = deletedEdgeStack.pop();
+        addEdge(deletedEdge.source.data, deletedEdge.dest.data, deletedEdge.cost);
+        System.out.println("Undo request completed.");
     }
 
     // the graph data is all here --------------------------
@@ -167,6 +169,23 @@ public class Graph<E>
     {
         // YOU COMPLETE THIS (USE THE RECURSIVE ALGORITHM GIVEN FOR LESSON 11 EXERCISE)
 
+        startVertex.visit();
+        visitor.visit(startVertex.data);
+
+        Iterator<Entry<E, Pair<Vertex<E>, Double>>> adjIter ;
+        Entry<E, Pair<Vertex<E>, Double>> entry;
+        Pair<Vertex<E>, Double> pair;
+
+        // iterate through adjacencies in adjList
+        adjIter = startVertex.adjList.entrySet().iterator();
+        while( adjIter.hasNext() )
+        {
+            entry = adjIter.next();
+            pair = entry.getValue();
+            if (!pair.first.isVisited()) {
+                depthFirstTraversalHelper(pair.first, visitor);
+            }
+        }
     }
 
 // WRITE THE INSTANCE METHOD HERE TO
