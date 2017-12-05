@@ -45,7 +45,7 @@ public class UserInterface {
         System.out.println("-\nMenu:\n");
         System.out.println("1. Add Edge");
         System.out.println("2. Remove Edge:");
-        System.out.println("3. Undo remove:");
+        System.out.println("3. Undo remove: (needs attention)");
         System.out.println("4. Display Graph");
         System.out.println("5. Solve Graph");
         System.out.println("6. Write Graph to File");
@@ -95,7 +95,7 @@ public class UserInterface {
     private void addEdge() {
         Scanner keyboard = new Scanner(System.in);
 
-        System.out.print("Source airport: ");
+        System.out.print("\nSource airport: ");
         Airport source = new Airport(promptAirportStr());
 
         System.out.print("Destination airport: ");
@@ -104,25 +104,29 @@ public class UserInterface {
         System.out.print("Cost: ");
         double cost = keyboard.nextInt();
 
+        // todo (enquiry): do we need to count the remove from the addEdge function
+        // when we write undo function
+        graph.remove(source, dest);
+
         graph.addEdge(source, dest, cost);
 
-        System.out.print("Adding complete.");
+        System.out.println("\nAdding complete.");
 
         waitForENTER();
     }
 
     private void removeEdge() {
-        System.out.print("Source airport: ");
+        System.out.print("\nSource airport: ");
         Airport source = new Airport(promptAirportStr());
 
         System.out.print("Destination airport: ");
         Airport dest = new Airport(promptAirportStr());
 
         if (graph.remove(source, dest)) {
-            System.out.print("Removing complete.");
+            System.out.println("\nRemoving complete.");
         }
         else {
-            System.out.print("Removing failed");
+            System.out.println("\nRemoving failed");
         }
 
         waitForENTER();
@@ -130,7 +134,7 @@ public class UserInterface {
 
     private void undo() {
         if (graph.deletedEdgeStack.isEmpty()) {
-            System.out.println("Oops! No previous deleting action found.");
+            System.out.println("\nOops! No previous deleting action found.");
         }
         else {
             graph.undo();
@@ -170,37 +174,39 @@ public class UserInterface {
     }
 
     private void showGraph_Depth_First() {
-        System.out.print("Preferred starting airport for traversal: ");
+        System.out.print("\nPreferred starting airport for traversal: ");
         Airport preferredStartingAirport = new Airport(promptAirportStr());
 
-        if (graph.vertexSet.containsKey(preferredStartingAirport)) {
-            System.out.println("Displaying graph in Depth-First Fashion: ");
+        boolean inSet = graph.vertexSet.containsKey(preferredStartingAirport);
+
+        if (inSet) {
+            System.out.println("\nDisplaying graph in a Depth-First Fashion: ");
             graph.depthFirstTraversal(preferredStartingAirport, new AirportVisitor());
         }
         else {
-            System.out.println("Starting vertex does not exist.");
+            System.out.println("\nStarting vertex does not exist.");
         }
 
         waitForENTER();
     }
 
     private void showGraph_Breadth_First() {
-        System.out.print("Preferred starting airport for traversal: ");
+        System.out.print("\nPreferred starting airport for traversal: ");
         Airport preferredStartingAirport = new Airport(promptAirportStr());
 
         if (graph.vertexSet.containsKey(preferredStartingAirport)) {
-            System.out.println("Displaying graph in Breadth_First Fashion: ");
+            System.out.println("\nDisplaying graph in a Breadth_First Fashion: ");
             graph.breadthFirstTraversal(preferredStartingAirport, new AirportVisitor());
         }
         else {
-            System.out.println("Starting vertex does not exist.");
+            System.out.println("\nStarting vertex does not exist.");
         }
 
         waitForENTER();
     }
 
     private void solveBestRoute() {
-        System.out.print("Source airport: ");
+        System.out.print("\nSource airport: ");
         Vertex<Airport> source = new Vertex<>(new Airport(promptAirportStr()));
 
         System.out.print("Destination airport: ");
@@ -208,23 +214,34 @@ public class UserInterface {
 
         graph.unvisitVertices();
 
-        ArrayList<Edge<Airport>> bestRoute = graph.applyDijkstras(source, dest);
+        Stack<Vertex<Airport>> bestRoute = graph.applyDijkstras(source, dest);
 
         if (bestRoute != null) {
-            System.out.println("The best route available is:");
-            printRoute(bestRoute);
+            System.out.println("\nThe best route available is:");
+            printRoute(bestRoute, source, dest);
         }
 
         waitForENTER();
     }
 
-    private void printRoute(ArrayList<Edge<Airport>> bestRoute) {
-        Iterator<Edge<Airport>> iter ;
+    private void printRoute(Stack<Vertex<Airport>> bestRoute, Vertex<Airport> sourceVertex, Vertex<Airport> destVertex) {
+        LinkedStack<Vertex<Airport>> stackForTrimming = new LinkedStack<>();
 
-        iter = bestRoute.iterator();
-        while (iter.hasNext()) {
-            System.out.println(iter.next().toString());
+        // trim the bestRoute
+        Vertex<Airport> tempVertex = bestRoute.pop();
+        while (!tempVertex.data.equals(sourceVertex.data)) {
+            stackForTrimming.push(tempVertex);
+            tempVertex = bestRoute.pop();
         }
+        stackForTrimming.push(tempVertex);
+        // finish trimming
+
+        tempVertex = stackForTrimming.pop();
+        while (tempVertex != null) {
+            System.out.println(tempVertex.data.toString() + ", " + tempVertex.weight);
+            tempVertex = stackForTrimming.pop();
+        }
+        System.out.println(destVertex.data.toString() + ", " + graph.vertexSet.get(destVertex.data).weight);
     }
 
     private String promptAirportStr() {

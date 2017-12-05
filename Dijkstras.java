@@ -5,101 +5,97 @@ import java.util.Comparator;
 public class Dijkstra<E> extends Graph<E>
 {
     private PriorityQueue< Vertex<E> > vertexPriorityQueue; // will add vertexes from largest to smallest weight
-    private Stack< Vertex<E> > visitedRouteStack; // track the route
-    private ArrayList< Edge<E> > theGrandRouteEdgeList; // the route
 
     public Dijkstra ()
     {
         vertexPriorityQueue = new PriorityQueue<>(vertexComparator);
-        visitedRouteStack = new Stack<>();
-        theGrandRouteEdgeList = new ArrayList<>();
     }
 
     // algorithms
-    public ArrayList< Edge<E> > applyDijkstras(Vertex<E> source, Vertex<E> dest)
+    public Stack<Vertex<E>> applyDijkstras(Vertex<E> source, Vertex<E> dest)
     {
+        unvisitVertices();
+
         Iterator<Entry<E, Pair<Vertex<E>, Double>>> iter ;
         Entry<E, Pair<Vertex<E>, Double>> entry;
         Pair<Vertex<E>, Double> pair;
-        Vertex<E> vertex;
 
-        /* todo: write hashCode() for our E object, that's how we can locate the incoming object
-           which contains the E object from the vertexSet, because the vertexSet hash the E object
-           during storing */
-
-        // todo: fix this
-        // @HELLO: we have to make sure that our data set is a "perfect channel", which means if two vertexes exist
-        // in our data set, there must be way to get from a to b, beside of the direct road, because like we
-        // discussed before, the direct route may not be available.
-
-        // if we have both the source and the dest
         if (vertexSet.containsKey(source.data) && vertexSet.containsKey(dest.data)) {
-            Vertex<E> sourceVertex = vertexSet.get(source.data);
+            Vertex<E> destVertex = vertexSet.get(dest.data);
+            Vertex<E> currVertex;
 
-            // set the the source's weight to 0
-            sourceVertex.setWeight(0.0);
+            Vertex<E> nextVertex = vertexSet.get(source.data);
 
-            // add a useless beginning vertex into our route stack for the convenience of the future route counting
-            visitedRouteStack.add(new Vertex<>());
-
-            // add it to queue, lets begin
-            vertexPriorityQueue.add(sourceVertex);
+            nextVertex.setWeight(0.0);
 
             do {
-                // get our least weighed vertex on graph (in the first loop, this will be the source)
-                // this will not have a nullptr exception, hopefully
-                vertex = vertexPriorityQueue.remove();
+                // update next vertex to current
+                currVertex = nextVertex;
 
-                // 1. visit the next least weighed vertex
-                // 2. save the route from previous vertex to current vertex
-                // 3. same current vertex
-                vertex.visit();
-                theGrandRouteEdgeList.add(new Edge<>(visitedRouteStack.peek(), vertex, (vertex.adjList.get(visitedRouteStack.peek().data)).second));
-                visitedRouteStack.push(vertex);
+                // visit the current vertex
+                currVertex.visit();
 
-                // iterate the adjList
-                iter = vertex.adjList.entrySet().iterator();
+                if (destVertex.isVisited()) {
+                    break;
+                }
+
+                // iterate the adj. vertexes of currVertex, if has any
+                iter = currVertex.adjList.entrySet().iterator();
                 while (iter.hasNext()) {
                     entry = iter.next();
                     pair = entry.getValue();
 
-                    // update the adj vertex by the cost of edge,
-                    // providing the edge cost is smaller
-                    if (pair.second < pair.first.getWeight()) {
-                        pair.first.setWeight(pair.second);
+                    // if the adj. vertex is not visited
+                    if (!pair.first.isVisited()) {
 
-                        // if the weight of a vertex which is contained in the priority queue changed,
-                        // remove it first, and then add it on.
-                        if (vertexPriorityQueue.contains(pair.first)) {
-                            vertexPriorityQueue.remove(pair.first);
+                        // if the weight can be updated, smaller
+                        if ((currVertex.getWeight() + pair.second) < pair.first.getWeight()) {
+
+                            // if a shorter path is available, record it in vertex
+                            recordTheShortestPathToVertex(currVertex, pair.first);
+
+                            //update
+                            pair.first.setWeight(currVertex.getWeight() + pair.second);
+
+                            // add iterated vertex in to priority queue, and special case
+                            if (vertexPriorityQueue.contains(pair.first)) {
+                                vertexPriorityQueue.remove(pair.first);
+                            }
+                            vertexPriorityQueue.add(pair.first); // add it on
                         }
-                        vertexPriorityQueue.add(pair.first);
                     }
                 }
-                // finish update the weight of the vertex from adjList
-            }
-            // if we reaches the dest, by that it means that the least weighed vertex in the graph
-            //  is now the dest vertex.
-            // vertex's equal depends on data's equal
-            while (!vertexPriorityQueue.peek().equals(dest));
 
-            // this is just for the completion of the algorithm
-            // 1. visit the dest
-            // 2. save route to dest
-            // 3. push dest to visited
-            // useless check, can be removed later
-            if (vertexPriorityQueue.peek().equals(dest)) {
-                dest.visit();
-                theGrandRouteEdgeList.add(new Edge<>(visitedRouteStack.peek(), dest, (dest.adjList.get(visitedRouteStack.peek().data)).second));
-                visitedRouteStack.push(dest);
+                // if has next vertex to go
+                if (!vertexPriorityQueue.isEmpty()) {
+                    nextVertex = vertexPriorityQueue.remove();
+                }
             }
+            while (!destVertex.isVisited());
 
-            return theGrandRouteEdgeList;
+            if (destVertex.isVisited()) {
+                return destVertex.previousVertexesInShortestPath;
+            }
+            else {
+                return null;
+            }
 
         } else {
-            System.out.println("Please check your source and destination, merci.");
+            System.out.println("\nPlease check your source and destination, merci.");
             return null;
         }
+    }
+
+    private void recordTheShortestPathToVertex(Vertex<E> currVertex, Vertex<E> adjVertex) {
+        Iterator<Vertex<E>> iter;
+        Vertex<E> tempVertex;
+
+        iter = currVertex.previousVertexesInShortestPath.iterator();
+        while (iter.hasNext()) {
+            tempVertex = iter.next();
+            adjVertex.previousVertexesInShortestPath.push(tempVertex);
+        }
+        adjVertex.previousVertexesInShortestPath.push(currVertex);
     }
 
     // to not to make too much change in vertex class, override the comparator for priority queue
