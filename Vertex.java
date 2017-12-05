@@ -9,9 +9,9 @@ class Vertex<E>
     public E data;
     public boolean visited;
 
-    // @todo: ask for approval
-    // private or protected?  inherit or not
-    public double weight = INFINITY;
+    public double weight = Double.POSITIVE_INFINITY;
+
+    public Stack<Vertex<E>> previousVertexesInShortestPath = new Stack<>();
 
     public Vertex( E x )
     {
@@ -20,12 +20,10 @@ class Vertex<E>
 
     public Vertex() { this(null); }
 
-    // @todo: ask for approval
     public void setWeight(double wt) {
         weight = wt;
     }
 
-    // @todo: ask for approval
     public double getWeight() {
         return weight;
     }
@@ -88,5 +86,4 @@ class Vertex<E>
         }
         System.out.println();
     }
-
 }
