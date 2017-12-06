@@ -1,7 +1,7 @@
 import java.util.*;
 import java.io.*;
 
-// todo dealing with the unexpected input, not only the numbers
+// todo dealing with the unexpected input, only the numeric
 
 public class UserInterface {
     private boolean status;
@@ -12,12 +12,15 @@ public class UserInterface {
     }
 
     public void greetings() {
-        System.out.println("Hi!");
-        System.out.println("Before the stimulation, please provide the address for the graph file.\n");
+        refresh();
+        System.out.println("Bonjour!");
+        System.out.println("Please provide the address for the graph file so that we can set it up for you.");
     }
 
     public boolean loadGraph(Dijkstra<Airport> graphP) {
         graph = graphP;
+
+        graph.clear();
 
         Scanner scanner = openInputFile();
         if (scanner != null) {
@@ -30,14 +33,21 @@ public class UserInterface {
     }
 
     private void loadFromFile(Scanner scanner, Dijkstra<Airport> graphP) {
+        String portName1;
+        String portName2;
+        double distance;
 
-        // todo: Tyler's function here, for loading the graph, which takes a
-        //       scanner and a graph prepare to load as arguments
+        while(scanner.hasNext()) {
+            portName1 = scanner.next();
+            portName2 = scanner.next();
+            distance = scanner.nextDouble();
+            graphP.addEdge(new Airport(portName1), new Airport(portName2), distance);
 
+        }
     }
 
     public void loadingFailed() {
-        System.out.println("Would you like to try that again?\n-");
+        System.out.println("\nWould you like to try that again?");
     }
 
     private void displayMainMenu() {
@@ -45,11 +55,13 @@ public class UserInterface {
         System.out.println("-\nMenu:\n");
         System.out.println("1. Add Edge");
         System.out.println("2. Remove Edge:");
-        System.out.println("3. Undo remove: (needs attention)");
+        System.out.println("3. Undo Remove");
         System.out.println("4. Display Graph");
         System.out.println("5. Solve Graph");
         System.out.println("6. Write Graph to File");
-        System.out.println("\n* Enter 0 to QUIT *\n-\n");
+
+        System.out.println("\n* Enter 0 to Change Graph *");
+        System.out.println("* Enter -1 to QUIT *\n-\n");
     }
 
     public void takeOrder() {
@@ -60,10 +72,18 @@ public class UserInterface {
         System.out.println("\"May I take your order?\" George Clooney asks.\n");
 
         System.out.print("Item: ");
+        while (!keyboard.hasNextInt()) {
+            keyboard.next();
+            System.out.println("\nThe input is not valid.");
+            System.out.print("\nItem: ");
+        }
         int item = keyboard.nextInt();
 
         switch (item) {
-            case 0: offStatus();
+            case -1: offStatus();
+                break;
+            case 0:
+                while (!loadGraph(graph)) { loadingFailed(); }
                 break;
             case 1: addEdge();
                 break;
@@ -104,8 +124,6 @@ public class UserInterface {
         System.out.print("Cost: ");
         double cost = keyboard.nextInt();
 
-        // todo (enquiry): do we need to count the remove from the addEdge function
-        // when we write undo function
         graph.remove(source, dest);
 
         graph.addEdge(source, dest, cost);
@@ -133,7 +151,7 @@ public class UserInterface {
     }
 
     private void undo() {
-        if (graph.deletedEdgeStack.isEmpty()) {
+        if (graph.deletedEdgeInFormOfPair.isEmpty()) {
             System.out.println("\nOops! No previous deleting action found.");
         }
         else {
@@ -155,6 +173,11 @@ public class UserInterface {
         System.out.println("\"In which fashion do you prefer displaying the graph?\" George Clooney asks.\n");
 
         System.out.print("Item: ");
+        while (!keyboard.hasNextInt()) {
+            keyboard.next();
+            System.out.println("\nThe input is not valid.");
+            System.out.print("\nItem: ");
+        }
         int item = keyboard.nextInt();
 
         switch (item) {
@@ -163,11 +186,12 @@ public class UserInterface {
             case 2:  showGraph_Breadth_First();
                 break;
             case 3:
+                System.out.println();
                 graph.showAdjTable();
                 waitForENTER();
                 break;
             default:
-                System.out.println("action needed for Man");
+                displayGraph();
                 waitForENTER();
                 break;
         }
@@ -218,13 +242,40 @@ public class UserInterface {
 
         if (bestRoute != null) {
             System.out.println("\nThe best route available is:");
-            printRoute(bestRoute, source, dest);
+
+            String temp = getRoute(bestRoute, source, dest);
+
+            System.out.println(temp);
+
+            System.out.println("\nWould you like to save it in to a text file? ");
+            System.out.print("1 for yes and 0 for no: ");
+
+            Scanner keyboard = new Scanner(System.in);
+            int item = keyboard.nextInt();
+
+            if (item != 0) {
+                System.out.print("\nFilename: ");
+
+                Scanner scanner = new Scanner(System.in);
+                String filename = scanner.nextLine();
+
+                String tempAddress = "/Users/mantinglin/Desktop/" + filename + ".txt";
+
+                try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(tempAddress), "utf-8"))) {
+                    writer.write(temp);
+                    System.out.println("\nWriting complete.");
+                } catch (Exception e) {
+                    System.out.println("Oops! This is super awkward.");
+                }
+            }
         }
 
         waitForENTER();
     }
 
-    private void printRoute(Stack<Vertex<Airport>> bestRoute, Vertex<Airport> sourceVertex, Vertex<Airport> destVertex) {
+    private String getRoute(Stack<Vertex<Airport>> bestRoute, Vertex<Airport> sourceVertex, Vertex<Airport> destVertex) {
+        String routeStr = "";
         LinkedStack<Vertex<Airport>> stackForTrimming = new LinkedStack<>();
 
         // trim the bestRoute
@@ -238,10 +289,12 @@ public class UserInterface {
 
         tempVertex = stackForTrimming.pop();
         while (tempVertex != null) {
-            System.out.println(tempVertex.data.toString() + ", " + tempVertex.weight);
+            routeStr += (tempVertex.data.toString() + ", " + tempVertex.weight + "\n");
             tempVertex = stackForTrimming.pop();
         }
-        System.out.println(destVertex.data.toString() + ", " + graph.vertexSet.get(destVertex.data).weight);
+        routeStr += (destVertex.data.toString() + ", " + graph.vertexSet.get(destVertex.data).weight);
+
+        return routeStr;
     }
 
     private String promptAirportStr() {
@@ -274,7 +327,7 @@ public class UserInterface {
         String filename;
         Scanner scanner=null;
 
-        System.out.print("Open Graph at: ");
+        System.out.print("\nOpen Graph at: ");
         filename = userScanner.nextLine();
         File file= new File(filename);
 
@@ -282,7 +335,7 @@ public class UserInterface {
             scanner = new Scanner(file);
         }// end try
         catch(FileNotFoundException fe){
-            System.out.println("-\nCan't open input file");
+            System.out.println("\nCan't open input file");
             return null; // array of 0 elements
         } // end catch
         return scanner;
@@ -362,3 +415,33 @@ public class UserInterface {
         graph = (Dijkstra<Airport>) graphP;
     }
 }
+
+/*
+/Users/mantinglin/Downloads/TestData1.txt
+------------------------
+Adj List for LAX: ATL(1942.0) SJC(308.0) SFO(337.0) LAS(236.0)
+Adj List for ATL: LAX(1942.0) SJC(2111.0) SFO(2134.0) LAS(1742.0)
+Adj List for SJC: LAX(308.0) ATL(2111.0) SFO(30.0) LAS(385.0)
+Adj List for SFO: LAX(337.0) ATL(2134.0) SJC(30.0) LAS(413.0)
+Adj List for LAS: LAX(236.0) ATL(1742.0) SJC(385.0) SFO(413.0)
+
+/Users/mantinglin/Downloads/TestData2.txt
+------------------------
+Adj List for ORD: PHX(1437.0) DFW(801.0) DEN(886.0) SEA(1715.0)
+Adj List for PHX: ORD(1437.0) DFW(866.0) DEN(601.0) SEA(1107.0)
+Adj List for DFW: ORD(801.0) PHX(866.0) DEN(641.0) SEA(1657.0)
+Adj List for DEN: ORD(886.0) PHX(601.0) DFW(641.0) SEA(1022.0)
+Adj List for SEA: ORD(1715.0) PHX(1107.0) DFW(1657.0) DEN(1022.0)
+
+/Users/mantinglin/Downloads/TestData3.txt
+------------------------
+Adj List for MDW: SAN(1724.0) DCA(599.0) TPA(998.0) BWI(609.0) FLL(1168.0) HNL(4245.0) SLC(1255.0) IAD(576.0)
+Adj List for SAN: MDW(1724.0) DCA(2270.0) TPA(2082.0) BWI(2290.0) FLL(2264.0) HNL(2610.0) SLC(626.0) IAD(2248.0)
+Adj List for DCA: MDW(599.0) SAN(2270.0) TPA(815.0) BWI(29.0) FLL(901.0) HNL(4832.0) SLC(1846.0) IAD(23.0)
+Adj List for TPA: MDW(998.0) SAN(2082.0) DCA(815.0) BWI(843.0) FLL(196.0) HNL(4683.0) SLC(1885.0) IAD(812.0)
+Adj List for BWI: MDW(609.0) SAN(2290.0) DCA(29.0) TPA(843.0) FLL(927.0) HNL(4847.0) SLC(1859.0) IAD(45.0)
+Adj List for FLL: MDW(1168.0) SAN(2264.0) DCA(901.0) TPA(196.0) BWI(927.0) HNL(4857.0) SLC(2081.0) IAD(902.0)
+Adj List for HNL: MDW(4245.0) SAN(2610.0) DCA(4832.0) TPA(4683.0) BWI(4847.0) FLL(4857.0) SLC(2990.0) IAD(4808.0)
+Adj List for SLC: MDW(1255.0) SAN(626.0) DCA(1846.0) TPA(1885.0) BWI(1859.0) FLL(2081.0) HNL(2990.0) IAD(1823.0)
+Adj List for IAD: MDW(576.0) SAN(2248.0) DCA(23.0) TPA(812.0) BWI(45.0) FLL(902.0) HNL(4808.0) SLC(1823.0)
+ */
