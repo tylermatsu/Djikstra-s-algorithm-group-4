@@ -11,14 +11,27 @@ public class Dijkstra<E> extends Graph<E>
         vertexPriorityQueue = new PriorityQueue<>(vertexComparator);
     }
 
-    // algorithms
+    // algorithm
     public Stack<Vertex<E>> applyDijkstras(Vertex<E> source, Vertex<E> dest)
     {
         unvisitVertices();
+        vertexPriorityQueue.clear();
 
         Iterator<Entry<E, Pair<Vertex<E>, Double>>> iter ;
         Entry<E, Pair<Vertex<E>, Double>> entry;
         Pair<Vertex<E>, Double> pair;
+
+        // clear the previous path!!!!!!!!!!!
+        Iterator<Entry<E, Vertex<E>>> preVertexIter;
+
+        preVertexIter = vertexSet.entrySet().iterator();
+        while( preVertexIter.hasNext() )
+        {
+            Vertex<E> vertexForClear = (preVertexIter.next().getValue());
+            vertexForClear.previousVertexesInShortestPath.clear();
+            vertexForClear.setWeight(Double.POSITIVE_INFINITY);
+        }
+        // finish clear the previous path!!!!!!!!!!!
 
         if (vertexSet.containsKey(source.data) && vertexSet.containsKey(dest.data)) {
             Vertex<E> destVertex = vertexSet.get(dest.data);
@@ -77,6 +90,7 @@ public class Dijkstra<E> extends Graph<E>
                 return destVertex.previousVertexesInShortestPath;
             }
             else {
+                System.out.println("\nSorry, no route available.");
                 return null;
             }
 
@@ -98,7 +112,6 @@ public class Dijkstra<E> extends Graph<E>
         adjVertex.previousVertexesInShortestPath.push(currVertex);
     }
 
-    // to not to make too much change in vertex class, override the comparator for priority queue
     // https://stackoverflow.com/questions/24706304/attempting-to-override-existing-comparator-for-priorityqueue-in-java
     private Comparator<Vertex<E>> vertexComparator = new Comparator<Vertex<E>>() {
 

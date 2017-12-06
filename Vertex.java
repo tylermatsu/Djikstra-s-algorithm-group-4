@@ -9,6 +9,7 @@ class Vertex<E>
     public E data;
     public boolean visited;
 
+    // todo: not using INFINITY variable, wait for approval
     public double weight = Double.POSITIVE_INFINITY;
 
     public Stack<Vertex<E>> previousVertexesInShortestPath = new Stack<>();
