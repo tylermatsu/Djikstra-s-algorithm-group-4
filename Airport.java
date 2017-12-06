@@ -5,6 +5,9 @@ public class Airport {
 
     public Airport (String paramStr) {
         airportName = paramStr;
+
+        // todo (enquiry): to initialize the hash filed, ask for professor's opinion
+        hashCode();
     }
 
     public void SetAirportName(String paramStr) {
@@ -19,9 +22,19 @@ public class Airport {
     public String toString() {
         return airportName;
     }
-    
-    // todo: hasher needed
-    
-}
 
-//
+    @Override
+    public int hashCode() {
+        return airportName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Airport)) return false;
+
+        Airport airport = (Airport) o;
+
+        return airportName != null ? airportName.equals(airport.airportName) : airport.airportName == null;
+    }
+}
