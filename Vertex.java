@@ -9,7 +9,7 @@ class Vertex<E>
     public E data;
     public boolean visited;
 
-    // todo: not using INFINITY variable, wait for approval
+    // APPROVED ADDING
     public double weight = INFINITY;
 
     public Stack<Vertex<E>> previousVertexesInShortestPath = new Stack<>();
@@ -21,10 +21,10 @@ class Vertex<E>
 
     public Vertex() { this(null); }
 
+    // APPROVED ADDING
     public void setWeight(double wt) {
         weight = wt;
     }
-
     public double getWeight() {
         return weight;
     }
