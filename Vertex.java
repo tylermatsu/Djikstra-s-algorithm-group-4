@@ -3,14 +3,14 @@ import java.util.Map.Entry;
 
 class Vertex<E>
 {
-    public static final double INFINITY = Double.MAX_VALUE;
+    public static final double INFINITY = Double.POSITIVE_INFINITY;
     public HashMap<E, Pair<Vertex<E>, Double> > adjList
             = new HashMap<E, Pair<Vertex<E>, Double> >();
     public E data;
     public boolean visited;
 
     // todo: not using INFINITY variable, wait for approval
-    public double weight = Double.POSITIVE_INFINITY;
+    public double weight = INFINITY;
 
     public Stack<Vertex<E>> previousVertexesInShortestPath = new Stack<>();
 
