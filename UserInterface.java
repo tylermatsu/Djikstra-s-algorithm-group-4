@@ -1,8 +1,6 @@
 import java.util.*;
 import java.io.*;
 
-// todo dealing with the unexpected input, only the numeric
-
 public class UserInterface {
     private boolean status;
     private Dijkstra<Airport> graph;
@@ -248,7 +246,7 @@ public class UserInterface {
             System.out.println(temp);
 
             System.out.println("\nWould you like to save it in to a text file? ");
-            System.out.print("1 for yes and 0 for no: ");
+            System.out.print("\n1 for YES and 0 for NO: ");
 
             Scanner keyboard = new Scanner(System.in);
             int item = keyboard.nextInt();
@@ -340,108 +338,10 @@ public class UserInterface {
         } // end catch
         return scanner;
     }
-
-    public void tempGraphBuilder(Graph<Airport> graphP) {
-        Airport airportA = new Airport("AAA");
-        Airport airportB = new Airport("BBB");
-        Airport airportC = new Airport("CCC");
-        Airport airportD = new Airport("DDD");
-        Airport airportE = new Airport("EEE");
-        Airport airportF = new Airport("FFF");
-        Airport airportG = new Airport("GGG");
-        Airport airportH = new Airport("HHH");
-        Airport airportI = new Airport("III");
-        Airport airportJ = new Airport("JJJ");
-
-        graphP.addEdge(airportA, airportB, 1);
-        graphP.addEdge(airportA, airportC, 2);
-        graphP.addEdge(airportA, airportD, 3);
-        graphP.addEdge(airportA, airportE, 4);
-        graphP.addEdge(airportA, airportF, 5);
-        graphP.addEdge(airportA, airportG, 6);
-        graphP.addEdge(airportA, airportH, 7);
-        graphP.addEdge(airportA, airportI, 8);
-        graphP.addEdge(airportA, airportJ, 9);
-
-        graphP.addEdge(airportB, airportC, 11);
-        graphP.addEdge(airportB, airportD, 12);
-        graphP.addEdge(airportB, airportE, 13);
-        graphP.addEdge(airportB, airportF, 14);
-        graphP.addEdge(airportB, airportG, 15);
-        graphP.addEdge(airportB, airportH, 16);
-        graphP.addEdge(airportB, airportI, 17);
-        graphP.addEdge(airportB, airportJ, 18);
-
-        graphP.addEdge(airportC, airportD, 21);
-        graphP.addEdge(airportC, airportE, 22);
-        graphP.addEdge(airportC, airportF, 23);
-        graphP.addEdge(airportC, airportG, 24);
-        graphP.addEdge(airportC, airportH, 25);
-        graphP.addEdge(airportC, airportI, 26);
-        graphP.addEdge(airportC, airportJ, 27);
-
-        graphP.addEdge(airportD, airportE, 31);
-        graphP.addEdge(airportD, airportF, 32);
-        graphP.addEdge(airportD, airportG, 33);
-        graphP.addEdge(airportD, airportH, 34);
-        graphP.addEdge(airportD, airportI, 35);
-        graphP.addEdge(airportD, airportJ, 36);
-
-
-        graphP.addEdge(airportE, airportF, 41);
-        graphP.addEdge(airportE, airportG, 42);
-        graphP.addEdge(airportE, airportH, 43);
-        graphP.addEdge(airportE, airportI, 44);
-        graphP.addEdge(airportE, airportJ, 45);
-
-
-        graphP.addEdge(airportF, airportG, 51);
-        graphP.addEdge(airportF, airportH, 52);
-        graphP.addEdge(airportF, airportI, 53);
-        graphP.addEdge(airportF, airportJ, 54);
-
-
-        graphP.addEdge(airportG, airportH, 61);
-        graphP.addEdge(airportG, airportI, 62);
-        graphP.addEdge(airportG, airportJ, 63);
-
-
-        graphP.addEdge(airportH, airportI, 71);
-        graphP.addEdge(airportH, airportJ, 72);
-
-
-        graphP.addEdge(airportI, airportJ, 81);
-
-        graph = (Dijkstra<Airport>) graphP;
-    }
 }
 
 /*
-/Users/mantinglin/Downloads/TestData1.txt
-------------------------
-Adj List for LAX: ATL(1942.0) SJC(308.0) SFO(337.0) LAS(236.0)
-Adj List for ATL: LAX(1942.0) SJC(2111.0) SFO(2134.0) LAS(1742.0)
-Adj List for SJC: LAX(308.0) ATL(2111.0) SFO(30.0) LAS(385.0)
-Adj List for SFO: LAX(337.0) ATL(2134.0) SJC(30.0) LAS(413.0)
-Adj List for LAS: LAX(236.0) ATL(1742.0) SJC(385.0) SFO(413.0)
-
-/Users/mantinglin/Downloads/TestData2.txt
-------------------------
-Adj List for ORD: PHX(1437.0) DFW(801.0) DEN(886.0) SEA(1715.0)
-Adj List for PHX: ORD(1437.0) DFW(866.0) DEN(601.0) SEA(1107.0)
-Adj List for DFW: ORD(801.0) PHX(866.0) DEN(641.0) SEA(1657.0)
-Adj List for DEN: ORD(886.0) PHX(601.0) DFW(641.0) SEA(1022.0)
-Adj List for SEA: ORD(1715.0) PHX(1107.0) DFW(1657.0) DEN(1022.0)
 
 /Users/mantinglin/Downloads/TestData3.txt
-------------------------
-Adj List for MDW: SAN(1724.0) DCA(599.0) TPA(998.0) BWI(609.0) FLL(1168.0) HNL(4245.0) SLC(1255.0) IAD(576.0)
-Adj List for SAN: MDW(1724.0) DCA(2270.0) TPA(2082.0) BWI(2290.0) FLL(2264.0) HNL(2610.0) SLC(626.0) IAD(2248.0)
-Adj List for DCA: MDW(599.0) SAN(2270.0) TPA(815.0) BWI(29.0) FLL(901.0) HNL(4832.0) SLC(1846.0) IAD(23.0)
-Adj List for TPA: MDW(998.0) SAN(2082.0) DCA(815.0) BWI(843.0) FLL(196.0) HNL(4683.0) SLC(1885.0) IAD(812.0)
-Adj List for BWI: MDW(609.0) SAN(2290.0) DCA(29.0) TPA(843.0) FLL(927.0) HNL(4847.0) SLC(1859.0) IAD(45.0)
-Adj List for FLL: MDW(1168.0) SAN(2264.0) DCA(901.0) TPA(196.0) BWI(927.0) HNL(4857.0) SLC(2081.0) IAD(902.0)
-Adj List for HNL: MDW(4245.0) SAN(2610.0) DCA(4832.0) TPA(4683.0) BWI(4847.0) FLL(4857.0) SLC(2990.0) IAD(4808.0)
-Adj List for SLC: MDW(1255.0) SAN(626.0) DCA(1846.0) TPA(1885.0) BWI(1859.0) FLL(2081.0) HNL(2990.0) IAD(1823.0)
-Adj List for IAD: MDW(576.0) SAN(2248.0) DCA(23.0) TPA(812.0) BWI(45.0) FLL(902.0) HNL(4808.0) SLC(1823.0)
+
  */
