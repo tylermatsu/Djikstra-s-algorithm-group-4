@@ -1,18 +1,24 @@
 import java.util.*;
-        import java.util.Map.Entry;
-        import java.io.*;
+import java.util.Map.Entry;
+import java.io.*;
 
 public class Graph<E>
 {
-    // todo: ask for approval
-    // actually we can move it into the Dijkstra class
-    public LinkedStack<Edge<E>> deletedEdgeStack;
+    public LinkedStack< Pair<Pair<Vertex<E>, Vertex<E>>, Double> > deletedEdgeInFormOfPair;
 
-    // todo: ask for approval
     public void undo() {
-        Edge<E> deletedEdge = deletedEdgeStack.pop();
-        addEdge(deletedEdge.source.data, deletedEdge.dest.data, deletedEdge.cost);
-        System.out.println("Undo request completed.");
+        Pair<Pair<Vertex<E>, Vertex<E>>, Double> deletedPair = deletedEdgeInFormOfPair.pop();
+
+        Vertex<E> startVertex = deletedPair.first.first;
+        Vertex<E> endVertex = deletedPair.first.second;
+        Double cost = deletedPair.second;
+
+        // in case of updating the cost
+        remove(startVertex.data, endVertex.data);
+
+        addEdge(startVertex.data, endVertex.data, cost);
+
+        System.out.println("\nUndo request completed.");
     }
 
     // the graph data is all here --------------------------
@@ -22,8 +28,8 @@ public class Graph<E>
     public Graph ()
     {
         vertexSet = new HashMap<E, Vertex<E> >();
-        // todo: ask for approval
-        deletedEdgeStack = new LinkedStack<>();
+
+        deletedEdgeInFormOfPair = new LinkedStack<>();
     }
 
     public void addEdge(E source, E dest, double cost)
@@ -75,6 +81,12 @@ public class Graph<E>
         {
             Pair<Vertex<E>, Double> endPair = startVertex.adjList.remove(end);
             removedOK = endPair!=null;
+
+            if (removedOK) {
+                Pair<Vertex<E>, Vertex<E>> tempVertexPair = new Pair<>(startVertex, endPair.first);
+                Pair<Pair<Vertex<E>, Vertex<E>>, Double> tempEdgePair = new Pair<>(tempVertexPair, endPair.second);
+                deletedEdgeInFormOfPair.push(tempEdgePair);
+            }
         }
 
         // Add if UNDIRECTED GRAPH:
@@ -165,6 +177,7 @@ public class Graph<E>
         }
     } // end breadthFirstTraversalHelper
 
+    // todo: check functional
     public void depthFirstTraversalHelper(Vertex<E> startVertex, Visitor<E> visitor)
     {
         // YOU COMPLETE THIS (USE THE RECURSIVE ALGORITHM GIVEN FOR LESSON 11 EXERCISE)
@@ -193,18 +206,13 @@ public class Graph<E>
     //         adjacency list TO A TEXT FILE (SUGGEST TO PASS AN
     //        ALREADY OPEN PrintWriter TO THIS) !
 
-    void writeAdjListToFile() {
-        // refresh
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-
+    public void writeAdjListToFile() {
         // prompt for filename
-        System.out.print("Filename: ");
+        System.out.print("\nFilename: ");
 
         Scanner scanner = new Scanner(System.in);
         String filename = scanner.nextLine();
 
-        // todo: change accordingly for the lab computer or something
         String tempAddress = "/Users/mantinglin/Desktop/" + filename + ".txt";
 
         // open file
