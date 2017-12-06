@@ -6,6 +6,7 @@ public class Graph<E>
 {
     public LinkedStack< Pair<Pair<Vertex<E>, Vertex<E>>, Double> > deletedEdgeInFormOfPair;
 
+    // APPROVED ADDING
     public void undo() {
         Pair<Pair<Vertex<E>, Vertex<E>>, Double> deletedPair = deletedEdgeInFormOfPair.pop();
 
@@ -82,6 +83,7 @@ public class Graph<E>
             Pair<Vertex<E>, Double> endPair = startVertex.adjList.remove(end);
             removedOK = endPair!=null;
 
+            // APPROVED ADDING
             if (removedOK) {
                 Pair<Vertex<E>, Vertex<E>> tempVertexPair = new Pair<>(startVertex, endPair.first);
                 Pair<Pair<Vertex<E>, Vertex<E>>, Double> tempEdgePair = new Pair<>(tempVertexPair, endPair.second);
@@ -177,7 +179,6 @@ public class Graph<E>
         }
     } // end breadthFirstTraversalHelper
 
-    // todo: check functional
     public void depthFirstTraversalHelper(Vertex<E> startVertex, Visitor<E> visitor)
     {
         // YOU COMPLETE THIS (USE THE RECURSIVE ALGORITHM GIVEN FOR LESSON 11 EXERCISE)
